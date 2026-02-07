@@ -1,28 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sinoy - GCS AI</title>
+    <title>Sinoy – GCS AI Helpdesk</title>
+    <style>
+        body { font-family: Arial; background-color: #f4f7f9; margin: 0; padding: 0; }
+        .chat-container { max-width: 600px; margin: 50px auto; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+        .chat-box { height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+        .user-msg { color: #333; margin: 5px 0; }
+        .bot-msg { color: #0056b3; margin: 5px 0; }
+        input[type=text] { width: 80%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; border-radius: 4px; border: none; background-color: #0056b3; color: #fff; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <h2>Sinoy – GCS AI Chat</h2>
-
-    <input id="msg" placeholder="Ask a question" />
-    <button onclick="send()">Send</button>
-
-    <p id="reply"></p>
+    <div class="chat-container">
+        <h2>Sinoy – GCS AI Helpdesk</h2>
+        <div class="chat-box" id="chat-box">
+            <div class="bot-msg">Hello 👋 I'm Sinoy. Ask me anything about Gurukul Convent School.</div>
+        </div>
+        <input type="text" id="user-input" placeholder="Type your question here..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
 
     <script>
-        function send() {
-            fetch("/chat", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    message: document.getElementById("msg").value
-                })
+        function sendMessage() {
+            const inputBox = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const question = inputBox.value.trim();
+            if(!question) return;
+
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'user-msg';
+            userMsg.textContent = question;
+            chatBox.appendChild(userMsg);
+            inputBox.value = '';
+
+            // Send to server
+            fetch('/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: question })
             })
-            .then(r => r.json())
-            .then(d => {
-                document.getElementById("reply").innerText = d.reply;
+            .then(res => res.json())
+            .then(data => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'bot-msg';
+                botMsg.textContent = data.answer;
+                chatBox.appendChild(botMsg);
+                chatBox.scrollTop = chatBox.scrollHeight;
             });
         }
     </script>
