@@ -1,7 +1,8 @@
 # app.py - Flask-based chatbot (Sinoy)
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from data import school_data
+import difflib
 
 app = Flask(__name__)
 
