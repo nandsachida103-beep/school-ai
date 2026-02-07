@@ -1,60 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Sinoy - GCS AI</title>
-    <style>
-        body {
-            background: #f4f6f8;
-            font-family: Arial;
-        }
-        .chatbox {
-            width: 420px;
-            margin: 60px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.15);
-        }
-        h2 {
-            text-align: center;
-            color: #1e88e5;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-        }
-        button {
-            width: 100%;
-            margin-top: 10px;
-            padding: 10px;
-            background: #1e88e5;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .reply {
-            margin-top: 15px;
-            background: #eef3f8;
-            padding: 10px;
-            border-radius: 6px;
-            white-space: pre-line;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sinoy – GCS AI Helpdesk</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef2f6;
+}
+
+/* HEADER */
+.header {
+    background: linear-gradient(90deg, #0b4f6c, #145da0);
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.header p {
+    margin: 3px 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* CHAT AREA */
+.chat-container {
+    max-width: 420px;
+    margin: auto;
+    height: calc(100vh - 130px);
+    padding: 15px;
+    overflow-y: auto;
+}
+
+/* MESSAGE BUBBLES */
+.bot-msg {
+    background: white;
+    padding: 12px 14px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    font-size: 15px;
+}
+
+/* INPUT BAR */
+.input-area {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: white;
+    border-top: 1px solid #ccc;
+}
+
+.input-box {
+    max-width: 420px;
+    margin: auto;
+    display: flex;
+    padding: 10px;
+}
+
+.input-box input {
+    flex: 1;
+    padding: 10px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+}
+
+.input-box button {
+    margin-left: 8px;
+    padding: 10px 14px;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    background: #145da0;
+    color: white;
+    cursor: pointer;
+}
+</style>
 </head>
+
 <body>
 
-<div class="chatbox">
-    <h2>🤖 Sinoy – GCS AI</h2>
-    <form method="post">
-        <input type="text" name="message" placeholder="Ask me about fees, class, bus..." required>
-        <button type="submit">Ask Sinoy</button>
-    </form>
+<!-- HEADER -->
+<div class="header">
+    <h2>Sinoy – GCS AI Helpdesk</h2>
+    <p>Gurukul Convent School Assistant</p>
+</div>
+
+<!-- CHAT -->
+<div class="chat-container">
+    <div class="bot-msg">
+        <b>Sinoy:</b> Hello 👋<br>
+        Main Sinoy hoon. Aap Gurukul Convent School ke baare me
+        kuch bhi pooch sakte ho.
+    </div>
 
     {% if reply %}
-    <div class="reply">{{ reply }}</div>
+    <div class="bot-msg">
+        <b>Sinoy:</b><br>{{ reply }}
+    </div>
     {% endif %}
+</div>
+
+<!-- INPUT -->
+<div class="input-area">
+    <form method="post" class="input-box">
+        <input type="text" name="message" placeholder="Type your question here..." required>
+        <button type="submit">Send</button>
+    </form>
 </div>
 
 </body>
