@@ -1,37 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>GCS AI Helpdesk</title>
+    <title>Sinoy - GCS AI</title>
     <style>
-        body { font-family: Arial; background: #f2f2f2; }
-        #chat { width: 400px; margin: auto; background: white; padding: 10px; }
-        input { width: 75%; padding: 8px; }
-        button { padding: 8px; }
+        body {
+            background: #f4f6f8;
+            font-family: Arial;
+        }
+        .chatbox {
+            width: 420px;
+            margin: 60px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.15);
+        }
+        h2 {
+            text-align: center;
+            color: #1e88e5;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .reply {
+            margin-top: 15px;
+            background: #eef3f8;
+            padding: 10px;
+            border-radius: 6px;
+            white-space: pre-line;
+        }
     </style>
 </head>
 <body>
-<div id="chat">
-    <h3>🤖 GCS AI – Sinoy</h3>
-    <div id="messages"></div>
-    <input id="msg" placeholder="Ask anything..." />
-    <button onclick="send()">Send</button>
+
+<div class="chatbox">
+    <h2>🤖 Sinoy – GCS AI</h2>
+    <form method="post">
+        <input type="text" name="message" placeholder="Ask me about fees, class, bus..." required>
+        <button type="submit">Ask Sinoy</button>
+    </form>
+
+    {% if reply %}
+    <div class="reply">{{ reply }}</div>
+    {% endif %}
 </div>
 
-<script>
-function send() {
-    let msg = document.getElementById("msg").value;
-    fetch("/chat", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({message: msg})
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("messages").innerHTML +=
-        "<p><b>You:</b> " + msg + "</p><p><b>Sinoy:</b> " +
-        JSON.stringify(data.reply) + "</p>";
-    });
-}
-</script>
 </body>
 </html>
