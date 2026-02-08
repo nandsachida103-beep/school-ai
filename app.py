@@ -1,3 +1,4 @@
+import re
 from flask import Flask, render_template, request, jsonify
 from data import school_data
 
@@ -5,7 +6,7 @@ app = Flask(__name__)
 
 FALLBACK = f"Sorry, I don't have information about that. You can contact the school at {', '.join(school_data['gcs_ai']['contact_numbers'])}."
 
-# Map ordinals to numbers
+# Mapping ordinals to numbers
 ordinals = {
     "1st": "1", "first": "1",
     "2nd": "2", "second": "2",
@@ -21,7 +22,7 @@ ordinals = {
     "12th": "12", "twelfth": "12"
 }
 
-# Keywords for teacher queries
+# Teacher keywords
 teacher_keywords = {
     "principal": ["management", "principal"],
     "director": ["management", "director"],
@@ -31,13 +32,7 @@ teacher_keywords = {
     "junior teachers": ["junior_teachers"]
 }
 
-# Keywords for fee queries
-fee_keywords = ["class", "fee"]
-
-# Keywords for transport
-transport_keywords = ["bus", "transport"]
-
-# Keywords for other data
+# Other info
 other_keywords = {
     "address": "address",
     "timing": "timings",
@@ -53,53 +48,47 @@ other_keywords = {
     "contact": ["gcs_ai", "contact_numbers"]
 }
 
+# -------------------------------
+# MAIN FUNCTION
+# -------------------------------
 def fetch_answer(user_input):
     user_input_lower = user_input.lower()
 
-    # -------------------------
-    # 1. Class fee queries
-    # -------------------------
-    if any(k in user_input_lower for k in fee_keywords):
-        for cls in school_data['fee_structure']:
-            if f"class {cls}" in user_input_lower or cls in user_input_lower:
-                return f"Class {cls} fee is ₹{school_data['fee_structure'][cls]}."
-        # Check ordinals
-        for ord_key, cls_num in ordinals.items():
-            if ord_key in user_input_lower:
-                return f"Class {cls_num} fee is ₹{school_data['fee_structure'][cls_num]}."
+    # ----------- CLASS FEE -----------
+    class_fee_pattern = r"(?:class\s*)?(\d{1,2}|1st|2nd|3rd|4th|5th|6th|7th|8th|9th|10th|11th|12th|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth)\s*(?:st|nd|rd|th)?\s*fee"
+    match = re.search(class_fee_pattern, user_input_lower)
+    if match:
+        cls = match.group(1)
+        cls_num = ordinals.get(cls, cls)  # Convert ordinal to number if needed
+        if cls_num in school_data['fee_structure']:
+            return f"Class {cls_num} fee is ₹{school_data['fee_structure'][cls_num]}."
+        else:
+            return FALLBACK
 
-    # -------------------------
-    # 2. Transport/Bus fees
-    # -------------------------
-    if any(k in user_input_lower for k in transport_keywords):
+    # ----------- BUS / TRANSPORT FEE -----------
+    if "bus" in user_input_lower or "transport" in user_input_lower:
         for route, fee in school_data['transport']['routes_fees'].items():
             if route.lower() in user_input_lower:
                 return f"Bus fee for {route} is ₹{fee}."
 
-    # -------------------------
-    # 3. Teacher queries
-    # -------------------------
+    # ----------- TEACHERS -----------
     for key, path in teacher_keywords.items():
         if key in user_input_lower:
             data = school_data
-            if isinstance(path, list):
-                for p in path:
-                    data = data.get(p, None)
-                    if data is None:
-                        return FALLBACK
+            for p in path:
+                data = data.get(p, None)
+                if data is None:
+                    return FALLBACK
             if isinstance(data, dict):
                 if key in ["senior teachers", "junior teachers"]:
-                    # List teachers clearly
-                    lines = [f"- {t}" for t in data] if key=="junior teachers" else [f"- {k}: {v}" for k,v in data.items()]
+                    lines = [f"- {k}: {v}" for k,v in data.items()] if key=="senior teachers" else [f"- {t}" for t in data]
                     return f"{key.title()}:\n" + "\n".join(lines)
                 else:
                     return f"{key.title()}: {data}"
             elif isinstance(data, list):
                 return ", ".join(data)
 
-    # -------------------------
-    # 4. Other keywords
-    # -------------------------
+    # ----------- OTHER INFO -----------
     for key, path in other_keywords.items():
         if key in user_input_lower:
             data = school_data
@@ -119,9 +108,9 @@ def fetch_answer(user_input):
 
     return FALLBACK
 
-# -------------------------
-# Flask routes
-# -------------------------
+# -------------------------------
+# FLASK ROUTES
+# -------------------------------
 @app.route("/")
 def home():
     return render_template("index.html")
