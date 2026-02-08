@@ -120,3 +120,4 @@ SCHOOL_DATA = {
 CONTACT = {
     "numbers": "9838421968, 8317001959, 7518249280"
 }
+school_data = SCHOOL_DATA
