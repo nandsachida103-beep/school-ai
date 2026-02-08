@@ -1,165 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>GCS AI – Sinoy</title>
+    <title>Sinoy – GCS AI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <style>
         body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
             margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #f4f6fb;
+            padding: 0;
         }
-
-        .chat-container {
-            max-width: 900px;
+        .container {
+            max-width: 500px;
             margin: auto;
             height: 100vh;
             display: flex;
             flex-direction: column;
+            background: white;
         }
-
-        .chat-header {
-            background: #0b5ed7;
+        .header {
+            background: #2563eb;
             color: white;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            font-size: 26px;
             font-weight: bold;
         }
-
-        .chat-header span {
-            font-size: 14px;
-            display: block;
-            font-weight: normal;
-        }
-
-        .chat-box {
+        .messages {
             flex: 1;
-            padding: 20px;
+            padding: 15px;
             overflow-y: auto;
         }
-
-        .message {
-            max-width: 75%;
-            padding: 15px 18px;
-            margin-bottom: 15px;
-            font-size: 18px;
-            line-height: 1.5;
-            border-radius: 18px;
-        }
-
         .user {
-            background: #0b5ed7;
-            color: white;
-            margin-left: auto;
-            border-bottom-right-radius: 5px;
+            text-align: right;
+            margin-bottom: 10px;
         }
-
+        .user span {
+            background: #2563eb;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 10px;
+            display: inline-block;
+            max-width: 80%;
+        }
         .bot {
-            background: #e9ecef;
-            color: #000;
-            margin-right: auto;
-            border-bottom-left-radius: 5px;
+            text-align: left;
+            margin-bottom: 10px;
         }
-
-        .input-area {
+        .bot span {
+            background: #e5e7eb;
+            color: black;
+            padding: 8px 12px;
+            border-radius: 10px;
+            display: inline-block;
+            max-width: 80%;
+        }
+        .input-box {
             display: flex;
-            padding: 15px;
-            background: white;
-            border-top: 1px solid #ddd;
+            padding: 10px;
+            border-top: 1px solid #cbd5f5;
         }
-
-        .input-area input {
+        input {
             flex: 1;
-            height: 60px;
-            font-size: 18px;
-            padding: 0 15px;
-            border-radius: 30px;
-            border: 1px solid #ccc;
-            outline: none;
+            padding: 10px;
+            font-size: 16px;
         }
-
-        .input-area button {
-            margin-left: 10px;
-            padding: 0 30px;
-            height: 60px;
-            font-size: 18px;
-            border-radius: 30px;
-            border: none;
-            background: #0b5ed7;
+        button {
+            padding: 10px 15px;
+            margin-left: 5px;
+            background: #2563eb;
             color: white;
-            cursor: pointer;
-        }
-
-        .input-area button:hover {
-            background: #084298;
-        }
-
-        @media (max-width: 600px) {
-            .chat-header {
-                font-size: 22px;
-            }
-            .message {
-                font-size: 16px;
-            }
+            border: none;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
 
-<div class="chat-container">
-    <div class="chat-header">
-        Gurukul Convent School – Sinoy 🤖
-        <span>Ask about fees, teachers, transport, admission</span>
+<div class="container">
+    <div class="header">
+        🤖 Sinoy – Gurukul Convent School AI
     </div>
 
-    <div class="chat-box" id="chatBox">
-        <div class="message bot">
-            Hello! I am <b>Sinoy</b>, GCS AI assistant 😊<br>
-            Ask me about fees, teachers, transport, admission, or facilities.
-        </div>
+    <div class="messages" id="messages">
+        <div class="bot"><span>Hello! I am Sinoy. Ask me anything about Gurukul Convent School.</span></div>
     </div>
 
-    <div class="input-area">
-        <input type="text" id="userInput" placeholder="Type your question here..." />
-        <button onclick="sendMessage()">Send</button>
+    <div class="input-box">
+        <input id="input" placeholder="Type your question..." />
+        <button onclick="send()">Send</button>
     </div>
 </div>
 
 <script>
-    function sendMessage() {
-        const input = document.getElementById("userInput");
-        const text = input.value.trim();
-        if (text === "") return;
+function send() {
+    let input = document.getElementById("input");
+    let msg = input.value;
+    if (!msg) return;
 
-        addMessage(text, "user");
-        input.value = "";
+    let messages = document.getElementById("messages");
+    messages.innerHTML += `<div class="user"><span>${msg}</span></div>`;
+    input.value = "";
 
-        fetch("/chat", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({message: text})
-        })
-        .then(res => res.json())
-        .then(data => {
-            addMessage(data.reply, "bot");
-        });
-    }
-
-    function addMessage(text, sender) {
-        const chatBox = document.getElementById("chatBox");
-        const msg = document.createElement("div");
-        msg.className = "message " + sender;
-        msg.innerHTML = text;
-        chatBox.appendChild(msg);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    document.getElementById("userInput").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") sendMessage();
+    fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: msg})
+    })
+    .then(res => res.json())
+    .then(data => {
+        messages.innerHTML += `<div class="bot"><span>${data.reply}</span></div>`;
+        messages.scrollTop = messages.scrollHeight;
     });
+}
 </script>
 
 </body>
